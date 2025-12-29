@@ -1,0 +1,44 @@
+{
+  "rules": {
+    "salas": {
+      "$salaId": {
+        ".read": true,
+        ".write": true,
+        "jogadores": {
+          "$jogadorId": {
+            ".read": true,
+            ".write": true
+          }
+        },
+        "numerosSorteados": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    },
+    "admin_rooms": {
+      "$roomId": {
+        ".read": true,
+        ".write": "auth != null && (data.child('adminId').val() === auth.uid || !data.exists())",
+        "players": {
+          "$playerId": {
+            ".read": true,
+            ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid"
+          }
+        },
+        "drawnNumbers": {
+          ".read": true,
+          ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid"
+        },
+        "gameState": {
+          ".read": true,
+          ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid"
+        },
+        "winner": {
+          ".read": true,
+          ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid"
+        }
+      }
+    }
+  }
+}
