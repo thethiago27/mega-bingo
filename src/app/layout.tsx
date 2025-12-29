@@ -1,14 +1,16 @@
-import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Outfit } from 'next/font/google';
+import './globals.css';
 
-const beVietnamPro = Outfit({
-  variable: "--font-outfit",
+const outfit = Outfit({
+  variable: '--font-outfit',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "Mega Bingo",
-  description: "Sistema de Bingo Online em Tempo Real",
+  title: 'Mega Bingo',
+  description: 'Sistema de Bingo Online em Tempo Real',
 };
 
 export default function RootLayout({
@@ -18,9 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${beVietnamPro.className} antialiased`}>
-        {children}
-      </body>
+      <body className={`${outfit.className} antialiased`}>{children}</body>
     </html>
   );
 }

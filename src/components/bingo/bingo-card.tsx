@@ -1,12 +1,17 @@
-"use client";
+'use client';
 
-import { useRoom } from "@/hooks/use-room";
-import { useWinState } from "@/hooks/use-win-state";
-import { CheckCircle } from "lucide-react";
-import { AnimatedNumber } from "./animated-number";
-import { CelebrationOverlay } from "./celebration-overlay";
-import { useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRoom } from '@/hooks/use-room';
+import { useWinState } from '@/hooks/use-win-state';
+import { CheckCircle } from 'lucide-react';
+import { AnimatedNumber } from './animated-number';
+import { useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+const CelebrationOverlay = dynamic(
+  () => import('./celebration-overlay').then((mod) => mod.CelebrationOverlay),
+  { ssr: false }
+);
 
 interface BingoCardProps {
   roomId: string;
@@ -14,7 +19,7 @@ interface BingoCardProps {
 
 export function BingoCard({ roomId }: BingoCardProps) {
   const searchParams = useSearchParams();
-  const playerName = searchParams.get("nome") || "Jogador";
+  const playerName = searchParams.get('nome') || 'Jogador';
 
   const {
     numerosMarcados,
@@ -31,7 +36,7 @@ export function BingoCard({ roomId }: BingoCardProps) {
     (numero: number) => {
       handleMarkNumber(numero);
     },
-    [handleMarkNumber],
+    [handleMarkNumber]
   );
 
   if (loading) {
