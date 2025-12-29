@@ -1,32 +1,10 @@
 import { ref, push, set, onValue, update, get } from 'firebase/database';
 import { getDb } from '@/lib/firebase-utils';
 import { gerarCartela } from '@/lib/bingo';
-import { Room, GameState } from '@/lib/types';
-import { generateRoomId } from '@/lib/room-id';
+import { Room, GameState, Sala, Jogador } from '@/lib/types';
 
-export interface Vencedor {
-  jogadorId: string;
-  nome: string;
-  rodada: number;
-  timestamp: number;
-}
-
-export interface Sala {
-  id: string;
-  nome: string;
-  criadoEm: number;
-  ativa: boolean;
-  numerosSorteados: number[];
-  rodadaAtual: number;
-  vencedores: Vencedor[];
-}
-
-export interface Jogador {
-  id: string;
-  nome: string;
-  cartela: number[];
-  numerosMarcados: number[];
-}
+// Re-export types for backwards compatibility
+export type { Sala, Jogador, Vencedor } from '@/lib/types';
 
 export async function createRoom(nome: string): Promise<string> {
   const db = getDb();

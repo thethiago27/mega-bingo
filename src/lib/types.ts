@@ -8,7 +8,7 @@ export interface Vencedor {
 export interface Sala {
   id: string;
   nome: string;
-  criadoEm: Date;
+  criadoEm: number; // timestamp para compatibilidade com Firebase
   ativa: boolean;
   numerosSorteados: number[];
   rodadaAtual: number;
@@ -18,19 +18,18 @@ export interface Sala {
 export interface Jogador {
   id: string;
   nome: string;
-  salaId: string;
   cartela: number[];
   numerosMarcados: number[];
 }
 
 export enum RoomStatus {
-  IN_PLAY = "Em andamento",
-  AWAITING_START = "Aguardando",
-  FINISHED = "Finalizado",
+  IN_PLAY = 'Em andamento',
+  AWAITING_START = 'Aguardando',
+  FINISHED = 'Finalizado',
 }
 
 // Admin Dashboard Room Interface
-export type GameState = "waiting" | "in_progress" | "completed";
+export type GameState = 'waiting' | 'in_progress' | 'completed';
 
 export interface Room {
   id: string;

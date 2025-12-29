@@ -11,9 +11,9 @@ const mockUpdate = vi.fn();
 const mockRef = vi.fn(() => 'mockRef');
 
 vi.mock('firebase/database', () => ({
-  ref: (...args: unknown[]) => mockRef(...args),
-  get: (...args: unknown[]) => mockGet(...args),
-  update: (...args: unknown[]) => mockUpdate(...args),
+  ref: (...args: Parameters<typeof mockRef>) => mockRef(...args),
+  get: (...args: Parameters<typeof mockGet>) => mockGet(...args),
+  update: (...args: Parameters<typeof mockUpdate>) => mockUpdate(...args),
   push: vi.fn(() => ({ key: 'mock-key' })),
   set: vi.fn(),
   onValue: vi.fn(),

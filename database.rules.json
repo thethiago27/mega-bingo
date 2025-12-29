@@ -1,18 +1,41 @@
 {
   "rules": {
     "salas": {
+      ".read": true,
+      ".write": "auth != null",
       "$salaId": {
         ".read": true,
-        ".write": true,
+        ".validate": "newData.hasChildren(['nome', 'criadoEm', 'ativa'])",
         "jogadores": {
           "$jogadorId": {
             ".read": true,
-            ".write": true
+            ".write": "auth != null",
+            ".validate": "newData.hasChildren(['nome', 'cartela', 'numerosMarcados'])",
+            "numerosMarcados": {
+              ".validate": "newData.isString() || (newData.hasChildren() && newData.val().length <= 20)"
+            }
           }
         },
         "numerosSorteados": {
           ".read": true,
-          ".write": true
+          ".write": "auth != null",
+          ".validate": "newData.val().length <= 60"
+        },
+        "vencedores": {
+          ".read": true,
+          ".write": "auth != null"
+        },
+        "nome": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 100"
+        },
+        "ativa": {
+          ".validate": "newData.isBoolean()"
+        },
+        "criadoEm": {
+          ".validate": "newData.isNumber()"
+        },
+        "rodadaAtual": {
+          ".validate": "newData.isNumber() && newData.val() >= 1"
         }
       }
     },
@@ -20,25 +43,38 @@
       "$roomId": {
         ".read": true,
         ".write": "auth != null && (data.child('adminId').val() === auth.uid || !data.exists())",
+        ".validate": "newData.hasChildren(['adminId', 'createdAt', 'gameState'])",
         "players": {
           "$playerId": {
             ".read": true,
-            ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid"
+            ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid",
+            ".validate": "newData.hasChildren(['name', 'cardNumbers', 'markedNumbers'])"
           }
         },
         "drawnNumbers": {
           ".read": true,
-          ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid"
+          ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid",
+          ".validate": "newData.val().length <= 60"
         },
         "gameState": {
           ".read": true,
-          ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid"
+          ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid",
+          ".validate": "newData.isString() && (newData.val() === 'waiting' || newData.val() === 'in_progress' || newData.val() === 'completed')"
         },
         "winner": {
           ".read": true,
           ".write": "auth != null && root.child('admin_rooms').child($roomId).child('adminId').val() === auth.uid"
+        },
+        "adminId": {
+          ".validate": "newData.isString()"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "completedAt": {
+          ".validate": "newData.isNumber()"
         }
       }
     }
-  }
+  } 
 }
