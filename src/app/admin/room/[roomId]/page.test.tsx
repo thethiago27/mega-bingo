@@ -988,7 +988,7 @@ describe('AdminRoomPage', () => {
       });
     });
 
-    it('should call iniciarNovaRodada when new round button clicked', async () => {
+    it('should call startNewRound when new round button clicked', async () => {
       const user = userEvent.setup();
       const drawnNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
       const mockSala = {
