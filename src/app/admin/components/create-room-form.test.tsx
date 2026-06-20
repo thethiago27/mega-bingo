@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { CreateRoomForm } from './create-room-form';
+import * as nextNavigation from 'next/navigation';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as useAdminAuthModule from '@/hooks/use-admin-auth';
 import * as databaseModule from '@/lib/database';
-import * as nextNavigation from 'next/navigation';
+import { CreateRoomForm } from './create-room-form';
 
 // Mock Firebase before any imports
 vi.mock('@/lib/firebase', () => ({
@@ -169,7 +169,7 @@ describe('CreateRoomForm', () => {
       await user.click(createButton);
 
       await waitFor(() => {
-        expect(mockCreateRoom).toHaveBeenCalledWith('Sala do Admin');
+        expect(mockCreateRoom).toHaveBeenCalledWith('test-admin-id');
       });
     });
 

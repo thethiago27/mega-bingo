@@ -1,12 +1,13 @@
 'use client';
 
+import { CheckCircle } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
+import { useCallback } from 'react';
 import { useRoom } from '@/hooks/use-room';
 import { useWinState } from '@/hooks/use-win-state';
-import { CheckCircle } from 'lucide-react';
+import { CARD_SIZE } from '@/lib/bingo';
 import { AnimatedNumber } from './animated-number';
-import { useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
 
 const CelebrationOverlay = dynamic(
   () => import('./celebration-overlay').then((mod) => mod.CelebrationOverlay),
@@ -19,22 +20,22 @@ interface BingoCardProps {
 
 export function BingoCard({ roomId }: BingoCardProps) {
   const searchParams = useSearchParams();
-  const playerName = searchParams.get('nome') || 'Jogador';
+  const playerName = searchParams.get('name') || 'Jogador';
 
   const {
-    numerosMarcados,
-    totalNumeros,
-    cartela,
+    markedNumbers,
+    totalNumbers,
+    cardNumbers,
     handleMarkNumber,
     currentNumber,
     loading,
   } = useRoom(roomId);
 
-  const winState = useWinState(10, numerosMarcados.length);
+  const winState = useWinState(CARD_SIZE, markedNumbers.length);
 
   const onMarkNumber = useCallback(
-    (numero: number) => {
-      handleMarkNumber(numero);
+    (number: number) => {
+      handleMarkNumber(number);
     },
     [handleMarkNumber]
   );
@@ -52,7 +53,7 @@ export function BingoCard({ roomId }: BingoCardProps) {
     );
   }
 
-  if (cartela.length === 0) {
+  if (cardNumbers.length === 0) {
     return (
       <section className="px-4 pt-6">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -76,27 +77,27 @@ export function BingoCard({ roomId }: BingoCardProps) {
               <CheckCircle className="w-4 h-4" />
             </span>
             <span className="text-xs font-bold text-gray-700 dark:text-gray-200">
-              {numerosMarcados.length}/{totalNumeros} Marcados
+              {markedNumbers.length}/{totalNumbers} Marcados
             </span>
           </div>
         </div>
 
         <div className={`grid grid-cols-2 gap-3 ${winState.cardClasses}`}>
-          {cartela.map((numero) => {
-            const isMarcado = numerosMarcados.includes(numero);
-            const isAtual = numero === currentNumber;
+          {cardNumbers.map((number) => {
+            const isMarked = markedNumbers.includes(number);
+            const isCurrent = number === currentNumber;
 
             return (
               <button
-                key={numero}
-                onClick={() => !isMarcado && onMarkNumber(numero)}
-                disabled={isMarcado}
+                key={number}
+                onClick={() => !isMarked && onMarkNumber(number)}
+                disabled={isMarked}
                 className="active:scale-95 transition-transform"
               >
                 <AnimatedNumber
-                  number={numero}
-                  isMarked={isMarcado}
-                  isNew={isAtual}
+                  number={number}
+                  isMarked={isMarked}
+                  isNew={isCurrent}
                 />
               </button>
             );

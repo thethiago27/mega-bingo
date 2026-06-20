@@ -1,4 +1,4 @@
-import { CreateRoomContent } from "./components/CreateRoomContent";
+import { CreateRoomContent } from './components/CreateRoomContent';
 
 export default function CreateRoomPage() {
   return <CreateRoomContent />;

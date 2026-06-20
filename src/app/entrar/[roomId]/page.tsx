@@ -1,6 +1,6 @@
-import AppHeader from "@/components/AppHeader";
-import HeroSection from "@/components/bingo/hero-section";
-import { JoinFormWithRoomId } from "./components/join-form-with-room-id";
+import AppHeader from '@/components/AppHeader';
+import HeroSection from '@/components/bingo/hero-section';
+import { JoinFormWithRoomId } from './components/join-form-with-room-id';
 
 interface EntrarRoomPageProps {
   params: Promise<{ roomId: string }>;

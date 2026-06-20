@@ -1,6 +1,6 @@
-import { initializeApp, getApps, FirebaseApp } from "firebase/app";
-import { getDatabase, Database } from "firebase/database";
-import { getAuth, Auth } from "firebase/auth";
+import { type FirebaseApp, getApps, initializeApp } from 'firebase/app';
+import { type Auth, getAuth } from 'firebase/auth';
+import { type Database, getDatabase } from 'firebase/database';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,7 +14,7 @@ const firebaseConfig = {
 
 // Check if we're in a browser environment and have the required config
 const canInitialize =
-  typeof window !== "undefined" &&
+  typeof window !== 'undefined' &&
   firebaseConfig.apiKey &&
   firebaseConfig.projectId &&
   firebaseConfig.databaseURL;
@@ -31,4 +31,4 @@ if (canInitialize) {
 
 // Export with type assertions for client-side usage
 // These will be undefined during SSR/SSG but that's expected
-export { app, db, auth };
+export { app, auth, db };

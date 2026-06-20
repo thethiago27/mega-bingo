@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useAdminAuth } from "@/hooks/use-admin-auth";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useAdminAuth } from '@/hooks/use-admin-auth';
 
 export default function AdminLayout({
   children,
@@ -14,7 +14,7 @@ export default function AdminLayout({
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push("/admin/login");
+      router.push('/admin/login');
     }
   }, [isAuthenticated, loading, router]);
 
@@ -40,6 +40,7 @@ export default function AdminLayout({
               </h1>
             </div>
             <button
+              type="button"
               onClick={logout}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             >

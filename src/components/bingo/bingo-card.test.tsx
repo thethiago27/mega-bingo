@@ -1,17 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { BingoCard } from './bingo-card';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as useRoomModule from '@/hooks/use-room';
 import * as useWinStateModule from '@/hooks/use-win-state';
 import { WinState } from '@/lib/animation-utils';
+import { BingoCard } from './bingo-card';
 
 // Mock dependencies
 vi.mock('@/hooks/use-room');
 vi.mock('@/hooks/use-win-state');
 vi.mock('next/navigation', () => ({
   useSearchParams: vi.fn(() => ({
-    get: vi.fn((key: string) => (key === 'nome' ? 'TestPlayer' : null)),
+    get: vi.fn((key: string) => (key === 'name' ? 'TestPlayer' : null)),
   })),
 }));
 
@@ -52,17 +52,17 @@ describe('BingoCard', () => {
   const mockHandleMarkNumber = vi.fn();
 
   const defaultUseRoomReturn = {
-    numerosMarcados: [],
-    totalNumeros: 10,
-    cartela: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    markedNumbers: [],
+    totalNumbers: 10,
+    cardNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     handleMarkNumber: mockHandleMarkNumber,
     currentNumber: null,
     loading: false,
     error: null,
-    sala: null,
-    jogadorId: 'test-player-id',
+    room: null,
+    playerId: 'test-player-id',
     isBingo: false,
-    numerosSorteados: [],
+    drawnNumbers: [],
   };
 
   const defaultWinState = {
@@ -107,7 +107,7 @@ describe('BingoCard', () => {
     it('should show message when cartela is empty', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        cartela: [],
+        cardNumbers: [],
       });
 
       render(<BingoCard roomId="test-room" />);
@@ -118,7 +118,7 @@ describe('BingoCard', () => {
     it('should show reload suggestion when cartela is empty', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        cartela: [],
+        cardNumbers: [],
       });
 
       render(<BingoCard roomId="test-room" />);
@@ -139,7 +139,7 @@ describe('BingoCard', () => {
     it('should render all numbers from cartela', () => {
       render(<BingoCard roomId="test-room" />);
 
-      defaultUseRoomReturn.cartela.forEach((numero) => {
+      defaultUseRoomReturn.cardNumbers.forEach((numero) => {
         expect(
           screen.getByTestId(`animated-number-${numero}`)
         ).toBeInTheDocument();
@@ -155,7 +155,7 @@ describe('BingoCard', () => {
     it('should update progress indicator with marked numbers', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        numerosMarcados: [1, 2, 3, 4, 5],
+        markedNumbers: [1, 2, 3, 4, 5],
       });
 
       render(<BingoCard roomId="test-room" />);
@@ -170,7 +170,7 @@ describe('BingoCard', () => {
 
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        numerosMarcados: [1, 2, 3],
+        markedNumbers: [1, 2, 3],
       });
 
       render(<BingoCard roomId="test-room" />);
@@ -238,7 +238,7 @@ describe('BingoCard', () => {
     it('should pass correct isMarked prop to AnimatedNumber', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        numerosMarcados: [1, 5, 10],
+        markedNumbers: [1, 5, 10],
       });
 
       render(<BingoCard roomId="test-room" />);
@@ -361,7 +361,7 @@ describe('BingoCard', () => {
 
       render(<BingoCard roomId="test-room" />);
 
-      defaultUseRoomReturn.cartela.forEach((numero) => {
+      defaultUseRoomReturn.cardNumbers.forEach((numero) => {
         expect(
           screen
             .getByTestId(`animated-number-${numero}`)
@@ -375,7 +375,7 @@ describe('BingoCard', () => {
     it('should show normal state with 0% completion', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        numerosMarcados: [],
+        markedNumbers: [],
       });
 
       vi.spyOn(useWinStateModule, 'useWinState').mockReturnValue({
@@ -395,7 +395,7 @@ describe('BingoCard', () => {
     it('should show near state with 75% completion', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        numerosMarcados: Array.from({ length: 8 }, (_, i) => i + 1),
+        markedNumbers: Array.from({ length: 8 }, (_, i) => i + 1),
       });
 
       vi.spyOn(useWinStateModule, 'useWinState').mockReturnValue({
@@ -415,7 +415,7 @@ describe('BingoCard', () => {
     it('should show critical state with 90% completion', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        numerosMarcados: Array.from({ length: 9 }, (_, i) => i + 1),
+        markedNumbers: Array.from({ length: 9 }, (_, i) => i + 1),
       });
 
       vi.spyOn(useWinStateModule, 'useWinState').mockReturnValue({
@@ -435,7 +435,7 @@ describe('BingoCard', () => {
     it('should show win state with 100% completion', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        numerosMarcados: Array.from({ length: 10 }, (_, i) => i + 1),
+        markedNumbers: Array.from({ length: 10 }, (_, i) => i + 1),
       });
 
       vi.spyOn(useWinStateModule, 'useWinState').mockReturnValue({
@@ -493,7 +493,7 @@ describe('BingoCard', () => {
 
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        numerosMarcados: [1, 2, 3],
+        markedNumbers: [1, 2, 3],
       });
 
       rerender(<BingoCard roomId="test-room" />);
@@ -524,7 +524,9 @@ describe('BingoCard', () => {
     it('should handle cartela with duplicate numbers', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        cartela: [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10],
+        cardNumbers: [
+          1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10,
+        ],
       });
 
       render(<BingoCard roomId="test-room" />);
@@ -533,10 +535,10 @@ describe('BingoCard', () => {
       expect(screen.getAllByTestId(/animated-number-/)).toHaveLength(20);
     });
 
-    it('should handle empty numerosMarcados array', () => {
+    it('should handle empty markedNumbers array', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        numerosMarcados: [],
+        markedNumbers: [],
       });
 
       render(<BingoCard roomId="test-room" />);
@@ -547,7 +549,7 @@ describe('BingoCard', () => {
     it('should handle all numbers marked', () => {
       vi.spyOn(useRoomModule, 'useRoom').mockReturnValue({
         ...defaultUseRoomReturn,
-        numerosMarcados: defaultUseRoomReturn.cartela,
+        markedNumbers: defaultUseRoomReturn.cardNumbers,
       });
 
       render(<BingoCard roomId="test-room" />);

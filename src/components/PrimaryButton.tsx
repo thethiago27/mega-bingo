@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { ArrowLeft, LucideIcon } from "lucide-react";
+import { ArrowLeft, type LucideIcon } from 'lucide-react';
 
 interface PrimaryButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   icon?: LucideIcon;
   disabled?: boolean;
-  type?: "button" | "submit";
+  type?: 'button' | 'submit';
 }
 
 export default function PrimaryButton({
@@ -15,7 +15,7 @@ export default function PrimaryButton({
   onClick,
   icon: Icon = ArrowLeft,
   disabled = false,
-  type = "button",
+  type = 'button',
 }: PrimaryButtonProps) {
   return (
     <button

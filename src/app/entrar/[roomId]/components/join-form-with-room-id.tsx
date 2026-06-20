@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useForm, revalidateLogic } from "@tanstack/react-form";
-import { InputField } from "@/components/input-field";
-import { z } from "zod";
-import { ArrowRight, User } from "lucide-react";
-import PrimaryButton from "@/components/PrimaryButton";
-import { useRouter } from "next/navigation";
-import { FieldGroup } from "@/components/ui/field";
-import { useEffect, useState } from "react";
-import { checkRoomExists } from "@/lib/database";
+import { revalidateLogic, useForm } from '@tanstack/react-form';
+import { ArrowRight, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { z } from 'zod';
+import { InputField } from '@/components/input-field';
+import PrimaryButton from '@/components/PrimaryButton';
+import { FieldGroup } from '@/components/ui/field';
+import { checkRoomExists } from '@/lib/database';
 
 const formSchema = z.object({
-  nome: z.string().min(5, "Nome muito curto").trim(),
+  nome: z.string().min(5, 'Nome muito curto').trim(),
 });
 
 interface JoinFormWithRoomIdProps {
@@ -28,10 +28,10 @@ export function JoinFormWithRoomId({ roomId }: JoinFormWithRoomIdProps) {
       try {
         const exists = await checkRoomExists(roomId);
         if (!exists) {
-          setRoomError("Sala não encontrada!");
+          setRoomError('Sala não encontrada!');
         }
       } catch {
-        setRoomError("Erro ao verificar sala");
+        setRoomError('Erro ao verificar sala');
       } finally {
         setCheckingRoom(false);
       }
@@ -42,17 +42,17 @@ export function JoinFormWithRoomId({ roomId }: JoinFormWithRoomIdProps) {
 
   const form = useForm({
     defaultValues: {
-      nome: "",
+      nome: '',
     },
     validationLogic: revalidateLogic({
-      mode: "submit",
-      modeAfterSubmission: "change",
+      mode: 'submit',
+      modeAfterSubmission: 'change',
     }),
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      router.push(`/sala/${roomId}?nome=${encodeURIComponent(value.nome)}`);
+      router.push(`/sala/${roomId}?name=${encodeURIComponent(value.nome)}`);
     },
   });
 
@@ -73,7 +73,8 @@ export function JoinFormWithRoomId({ roomId }: JoinFormWithRoomIdProps) {
         </h3>
         <p className="text-red-700 mb-4">{roomError}</p>
         <button
-          onClick={() => router.push("/entrar")}
+          type="button"
+          onClick={() => router.push('/entrar')}
           className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition"
         >
           Voltar
@@ -92,7 +93,7 @@ export function JoinFormWithRoomId({ roomId }: JoinFormWithRoomIdProps) {
     >
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p className="text-sm text-blue-700">
-          Entrando na sala:{" "}
+          Entrando na sala:{' '}
           <span className="font-mono font-bold">{roomId}</span>
         </p>
       </div>
@@ -112,7 +113,7 @@ export function JoinFormWithRoomId({ roomId }: JoinFormWithRoomIdProps) {
               />
               {field.state.meta.errors.map((error, i) => (
                 <p key={i} className="text-red-500 text-sm">
-                  {typeof error === "string" ? error : error?.message}
+                  {typeof error === 'string' ? error : error?.message}
                 </p>
               ))}
             </div>
@@ -127,7 +128,7 @@ export function JoinFormWithRoomId({ roomId }: JoinFormWithRoomIdProps) {
             icon={ArrowRight}
             disabled={isSubmitting || !isFormValid}
           >
-            {isSubmitting ? "Entrando..." : "Entrar"}
+            {isSubmitting ? 'Entrando...' : 'Entrar'}
           </PrimaryButton>
         )}
       </form.Subscribe>

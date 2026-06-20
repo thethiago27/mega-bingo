@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import {
+  onAuthStateChanged,
   signInAnonymously,
   signOut,
-  onAuthStateChanged,
-  User,
-} from "firebase/auth";
-import { auth } from "@/lib/firebase";
+  type User,
+} from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { auth } from '@/lib/firebase';
 
 export interface AdminSession {
   isAuthenticated: boolean;
@@ -26,9 +26,9 @@ interface UseAdminAuthReturn {
 
 // localStorage helpers
 function getStoredSession(): AdminSession | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
   try {
-    const stored = localStorage.getItem("admin-session");
+    const stored = localStorage.getItem('admin-session');
     return stored ? JSON.parse(stored) : null;
   } catch {
     return null;
@@ -36,12 +36,12 @@ function getStoredSession(): AdminSession | null {
 }
 
 function setStoredSession(session: AdminSession | null): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   try {
     if (session) {
-      localStorage.setItem("admin-session", JSON.stringify(session));
+      localStorage.setItem('admin-session', JSON.stringify(session));
     } else {
-      localStorage.removeItem("admin-session");
+      localStorage.removeItem('admin-session');
     }
   } catch {
     // Silently fail
@@ -51,7 +51,7 @@ function setStoredSession(session: AdminSession | null): void {
 export function useAdminAuth(): UseAdminAuthReturn {
   const router = useRouter();
   const [session, setSession] = useState<AdminSession | null>(() =>
-    getStoredSession(),
+    getStoredSession()
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +83,7 @@ export function useAdminAuth(): UseAdminAuthReturn {
 
   const loginAnonymously = async () => {
     if (!auth) {
-      setError("Firebase não está inicializado");
+      setError('Firebase não está inicializado');
       return;
     }
 
@@ -101,7 +101,7 @@ export function useAdminAuth(): UseAdminAuthReturn {
       setStoredSession(newSession);
     } catch (err) {
       const firebaseError = err as { code?: string; message?: string };
-      const errorMessage = firebaseError.message || "Erro ao fazer login";
+      const errorMessage = firebaseError.message || 'Erro ao fazer login';
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
@@ -118,9 +118,9 @@ export function useAdminAuth(): UseAdminAuthReturn {
       await signOut(auth);
       setSession(null);
       setStoredSession(null);
-      router.push("/");
+      router.push('/');
     } catch {
-      setError("Erro ao fazer logout");
+      setError('Erro ao fazer logout');
     }
   };
 

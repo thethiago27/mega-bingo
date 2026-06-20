@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { memo, useState, useCallback } from "react";
-import { Copy, Check, RotateCcw } from "lucide-react";
+import { Check, Copy, RotateCcw } from 'lucide-react';
+import { memo, useCallback, useState } from 'react';
 
 interface Player {
   playerId: string;
-  nome: string;
-  cartela: number[];
+  name: string;
+  cardNumbers: number[];
 }
 
 interface RoomHeaderProps {
   roomId: string;
   playerCount: number;
-  numerosSorteados: number[];
-  vencedores: Player[];
-  rodadaAtual: number;
+  drawnNumbers: number[];
+  winners: Player[];
+  currentRound: number;
   onNewRound: () => Promise<void>;
   startingNewRound: boolean;
   hasWinner: boolean;
@@ -23,9 +23,9 @@ interface RoomHeaderProps {
 export const RoomHeader = memo(function RoomHeader({
   roomId,
   playerCount,
-  numerosSorteados,
-  vencedores,
-  rodadaAtual,
+  drawnNumbers,
+  winners,
+  currentRound,
   onNewRound,
   startingNewRound,
   hasWinner,
@@ -33,9 +33,9 @@ export const RoomHeader = memo(function RoomHeader({
   const [copied, setCopied] = useState(false);
 
   const shareUrl =
-    typeof window !== "undefined"
+    typeof window !== 'undefined'
       ? `${window.location.origin}/entrar/${roomId}`
-      : "";
+      : '';
 
   const handleCopyLink = useCallback(() => {
     if (shareUrl) {
@@ -52,22 +52,22 @@ export const RoomHeader = memo(function RoomHeader({
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold text-gray-900">Sala {roomId}</h1>
             <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full">
-              Rodada {rodadaAtual}
+              Rodada {currentRound}
             </span>
           </div>
           <p className="text-gray-600">
-            {playerCount} jogador(es) • {numerosSorteados.length} número(s)
+            {playerCount} jogador(es) • {drawnNumbers.length} número(s)
             sorteado(s)
           </p>
         </div>
 
-        {vencedores.length > 0 && (
+        {winners.length > 0 && (
           <div className="bg-green-100 border border-green-300 rounded-lg px-4 py-2">
             <p className="text-green-900 font-semibold">
-              🎉 {vencedores.length} Vencedor(es)!
+              🎉 {winners.length} Vencedor(es)!
             </p>
             <div className="text-sm text-green-800 mt-1">
-              {vencedores.map((v) => v.nome).join(", ")}
+              {winners.map((w) => w.name).join(', ')}
             </div>
           </div>
         )}
@@ -78,7 +78,7 @@ export const RoomHeader = memo(function RoomHeader({
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-yellow-900">
-                Rodada {rodadaAtual} finalizada!
+                Rodada {currentRound} finalizada!
               </p>
               <p className="text-sm text-yellow-700">
                 Inicie uma nova rodada para continuar o jogo. Todos os jogadores
@@ -86,14 +86,15 @@ export const RoomHeader = memo(function RoomHeader({
               </p>
             </div>
             <button
+              type="button"
               onClick={onNewRound}
               disabled={startingNewRound}
               className="px-4 py-2 bg-yellow-600 text-white font-semibold rounded-lg hover:bg-yellow-700 disabled:bg-yellow-300 disabled:cursor-not-allowed transition flex items-center gap-2"
             >
               <RotateCcw
-                className={`w-4 h-4 ${startingNewRound ? "animate-spin" : ""}`}
+                className={`w-4 h-4 ${startingNewRound ? 'animate-spin' : ''}`}
               />
-              {startingNewRound ? "Iniciando..." : "Nova Rodada"}
+              {startingNewRound ? 'Iniciando...' : 'Nova Rodada'}
             </button>
           </div>
         </div>
@@ -112,6 +113,7 @@ export const RoomHeader = memo(function RoomHeader({
             className="flex-1 px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg font-mono text-gray-700"
           />
           <button
+            type="button"
             onClick={handleCopyLink}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2 whitespace-nowrap"
           >

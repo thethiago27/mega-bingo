@@ -1,12 +1,12 @@
-import { describe, it, expect } from "vitest";
-import * as fc from "fast-check";
-import { generateRoomId } from "./room-id";
+import * as fc from 'fast-check';
+import { describe, expect, it } from 'vitest';
+import { generateRoomId } from './room-id';
 
-describe("Room ID Generation", () => {
+describe('Room ID Generation', () => {
   // Property 1: Room ID Uniqueness
   // Feature: admin-dashboard, Property 1: Room ID Uniqueness
   // Validates: Requirements 1.2
-  it("Property 1: Room ID Uniqueness - generates unique IDs", () => {
+  it('Property 1: Room ID Uniqueness - generates unique IDs', () => {
     fc.assert(
       fc.property(fc.constant(null), () => {
         // Generate multiple room IDs
@@ -16,12 +16,12 @@ describe("Room ID Generation", () => {
         const uniqueIds = new Set(ids);
         expect(uniqueIds.size).toBe(100);
       }),
-      { numRuns: 10 },
+      { numRuns: 10 }
     );
   });
 
   // Unit tests for room ID generation
-  it("should generate IDs with 4-6 characters", () => {
+  it('should generate IDs with 4-6 characters', () => {
     // Requirements 1.2
     for (let i = 0; i < 50; i++) {
       const id = generateRoomId();
@@ -30,7 +30,7 @@ describe("Room ID Generation", () => {
     }
   });
 
-  it("should only use alphanumeric characters", () => {
+  it('should only use alphanumeric characters', () => {
     // Requirements 1.2
     const alphanumericRegex = /^[A-Z0-9]+$/;
     for (let i = 0; i < 50; i++) {
@@ -39,7 +39,7 @@ describe("Room ID Generation", () => {
     }
   });
 
-  it("should generate non-empty IDs", () => {
+  it('should generate non-empty IDs', () => {
     // Requirements 1.2
     for (let i = 0; i < 50; i++) {
       const id = generateRoomId();

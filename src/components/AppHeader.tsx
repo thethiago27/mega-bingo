@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { Dice3 } from "lucide-react";
+import { Dice3 } from 'lucide-react';
 
 interface AppHeaderProps {
   title?: string;
 }
 
-export default function AppHeader({ title = "Mega Bingo" }: AppHeaderProps) {
+export default function AppHeader({ title = 'Mega Bingo' }: AppHeaderProps) {
   return (
     <div className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-gray-50/95 backdrop-blur-sm">
       <div className="flex items-center gap-3">

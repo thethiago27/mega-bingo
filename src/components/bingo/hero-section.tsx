@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { LayoutGrid } from "lucide-react";
+import { LayoutGrid } from 'lucide-react';
 
 interface HeroSectionProps {
   title: string;

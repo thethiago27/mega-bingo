@@ -1,6 +1,6 @@
-import { Suspense } from "react";
-import { RoomLoader } from "./components/room-loader";
-import { Room } from "./components/room";
+import { Suspense } from 'react';
+import { Room } from './components/room';
+import { RoomLoader } from './components/room-loader';
 
 export default function Page() {
   return (

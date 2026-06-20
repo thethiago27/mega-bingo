@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { CreateRoomForm } from "../../components/create-room-form";
+import { CreateRoomForm } from '../../components/create-room-form';
 
 export function CreateRoomContent() {
   return (

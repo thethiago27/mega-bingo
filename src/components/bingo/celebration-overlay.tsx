@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 interface CelebrationOverlayProps {
   show: boolean;
@@ -33,7 +33,7 @@ export function CelebrationOverlay({
     left: Math.random() * 100,
     delay: Math.random() * 0.5,
     duration: 2 + Math.random() * 1,
-    color: ["#fbbf24", "#ef4444", "#a855f7", "#22c55e", "#3b82f6"][
+    color: ['#fbbf24', '#ef4444', '#a855f7', '#22c55e', '#3b82f6'][
       Math.floor(Math.random() * 5)
     ],
   }));

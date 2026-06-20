@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as useRoomModule from '@/hooks/use-room';
 
 // Mock Firebase before any imports
@@ -15,15 +15,15 @@ import HistoryStrip from './history-strip';
 const createMockUseRoomReturn = (
   overrides: Partial<ReturnType<typeof useRoomModule.useRoom>> = {}
 ): ReturnType<typeof useRoomModule.useRoom> => ({
-  sala: null,
-  jogadorId: null,
-  cartela: [],
-  numerosMarcados: [],
-  numerosSorteados: [],
+  room: null,
+  playerId: null,
+  cardNumbers: [],
+  markedNumbers: [],
+  drawnNumbers: [],
   loading: false,
   error: null,
   isBingo: false,
-  totalNumeros: 0,
+  totalNumbers: 0,
   currentNumber: null,
   handleMarkNumber: vi.fn(),
   ...overrides,
@@ -37,7 +37,7 @@ describe('HistoryStrip Component', () => {
   it('should render without errors when no numbers are drawn', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [],
+        drawnNumbers: [],
         currentNumber: null,
       })
     );
@@ -50,7 +50,7 @@ describe('HistoryStrip Component', () => {
   it('should display the last 4 drawn numbers', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [10, 25, 42, 67, 89],
+        drawnNumbers: [10, 25, 42, 67, 89],
         currentNumber: 89,
       })
     );
@@ -70,7 +70,7 @@ describe('HistoryStrip Component', () => {
   it('should display numbers with zero padding', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [1, 5, 9],
+        drawnNumbers: [1, 5, 9],
         currentNumber: 9,
       })
     );
@@ -85,7 +85,7 @@ describe('HistoryStrip Component', () => {
   it('should highlight the current number with special styling', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [10, 25, 42],
+        drawnNumbers: [10, 25, 42],
         currentNumber: 42,
       })
     );
@@ -99,7 +99,7 @@ describe('HistoryStrip Component', () => {
   it('should display order numbers for each drawn number', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [10, 25, 42],
+        drawnNumbers: [10, 25, 42],
         currentNumber: 42,
       })
     );
@@ -114,7 +114,7 @@ describe('HistoryStrip Component', () => {
   it('should apply different opacity to non-current numbers', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [10, 25, 42, 67],
+        drawnNumbers: [10, 25, 42, 67],
         currentNumber: 67,
       })
     );
@@ -139,7 +139,7 @@ describe('HistoryStrip Component', () => {
   it('should render separators between numbers', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [10, 25, 42],
+        drawnNumbers: [10, 25, 42],
         currentNumber: 42,
       })
     );
@@ -154,7 +154,7 @@ describe('HistoryStrip Component', () => {
   it('should not render separator after the last number', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [10, 25],
+        drawnNumbers: [10, 25],
         currentNumber: 25,
       })
     );
@@ -169,7 +169,7 @@ describe('HistoryStrip Component', () => {
   it('should handle single drawn number', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [42],
+        drawnNumbers: [42],
         currentNumber: 42,
       })
     );
@@ -186,7 +186,7 @@ describe('HistoryStrip Component', () => {
   it('should handle exactly 4 drawn numbers', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [10, 25, 42, 67],
+        drawnNumbers: [10, 25, 42, 67],
         currentNumber: 67,
       })
     );
@@ -202,7 +202,7 @@ describe('HistoryStrip Component', () => {
   it('should handle more than 4 drawn numbers and show only last 4', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        drawnNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         currentNumber: 10,
       })
     );
@@ -223,7 +223,7 @@ describe('HistoryStrip Component', () => {
   it('should display correct order numbers for last 4 of many drawn numbers', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [1, 2, 3, 4, 5, 6, 7, 8],
+        drawnNumbers: [1, 2, 3, 4, 5, 6, 7, 8],
         currentNumber: 8,
       })
     );
@@ -240,7 +240,7 @@ describe('HistoryStrip Component', () => {
   it('should apply blue color to current number order badge', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [10, 25, 42],
+        drawnNumbers: [10, 25, 42],
         currentNumber: 42,
       })
     );
@@ -254,7 +254,7 @@ describe('HistoryStrip Component', () => {
   it('should apply gray color to non-current number order badges', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [10, 25, 42],
+        drawnNumbers: [10, 25, 42],
         currentNumber: 42,
       })
     );
@@ -272,7 +272,7 @@ describe('HistoryStrip Component', () => {
     const mockUseRoom = vi.spyOn(useRoomModule, 'useRoom');
     mockUseRoom.mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [],
+        drawnNumbers: [],
         currentNumber: null,
       })
     );
@@ -287,7 +287,7 @@ describe('HistoryStrip Component', () => {
 
     mockUseRoom.mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [],
+        drawnNumbers: [],
         currentNumber: null,
       })
     );
@@ -297,7 +297,7 @@ describe('HistoryStrip Component', () => {
 
     mockUseRoom.mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [42],
+        drawnNumbers: [42],
         currentNumber: 42,
       })
     );
@@ -309,7 +309,7 @@ describe('HistoryStrip Component', () => {
   it('should render with correct section styling classes', () => {
     vi.spyOn(useRoomModule, 'useRoom').mockReturnValue(
       createMockUseRoomReturn({
-        numerosSorteados: [10],
+        drawnNumbers: [10],
         currentNumber: 10,
       })
     );

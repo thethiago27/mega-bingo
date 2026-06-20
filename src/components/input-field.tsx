@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { LucideIcon, User } from "lucide-react";
+import { type LucideIcon, User } from 'lucide-react';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 
 interface InputFieldProps {
   id: string;
@@ -15,7 +15,7 @@ export function InputField({
   icon: Icon = User,
   errors,
   ...props
-}: React.ComponentProps<"input"> & InputFieldProps) {
+}: React.ComponentProps<'input'> & InputFieldProps) {
   return (
     <Field className="space-y-2">
       <FieldLabel

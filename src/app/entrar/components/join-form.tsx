@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useForm, revalidateLogic } from "@tanstack/react-form";
-import { InputField } from "@/components/input-field";
-import { z } from "zod";
-import { ArrowRight, Hash, User } from "lucide-react";
-import PrimaryButton from "@/components/PrimaryButton";
-import { useRouter } from "next/navigation";
-import { FieldGroup } from "@/components/ui/field";
-import { checkRoomExists } from "@/lib/database";
+import { revalidateLogic, useForm } from '@tanstack/react-form';
+import { ArrowRight, Hash, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { z } from 'zod';
+import { InputField } from '@/components/input-field';
+import PrimaryButton from '@/components/PrimaryButton';
+import { FieldGroup } from '@/components/ui/field';
+import { checkRoomExists } from '@/lib/database';
 
 const formSchema = z.object({
-  salaId: z.string().min(5, "Sala inválida").trim(),
-  nome: z.string().min(5, "Nome muito curto").trim(),
+  salaId: z.string().min(5, 'Sala inválida').trim(),
+  nome: z.string().min(5, 'Nome muito curto').trim(),
 });
 
 export function JoinForm() {
@@ -19,20 +19,20 @@ export function JoinForm() {
 
   const form = useForm({
     defaultValues: {
-      salaId: "",
-      nome: "",
+      salaId: '',
+      nome: '',
     },
     // Habilita a validação dinâmica conforme a documentação
     validationLogic: revalidateLogic({
-      mode: "submit",
-      modeAfterSubmission: "change",
+      mode: 'submit',
+      modeAfterSubmission: 'change',
     }),
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
       router.push(
-        `/sala/${value.salaId}?nome=${encodeURIComponent(value.nome)}`,
+        `/sala/${value.salaId}?name=${encodeURIComponent(value.nome)}`
       );
     },
   });
@@ -58,7 +58,7 @@ export function JoinForm() {
               const roomExists = await checkRoomExists(value);
 
               if (!roomExists) {
-                return "Sala não encontrada!";
+                return 'Sala não encontrada!';
               }
 
               return undefined;
@@ -78,7 +78,7 @@ export function JoinForm() {
               />
               {field.state.meta.errors.map((error, i) => (
                 <p key={i} className="text-red-500 text-sm">
-                  {typeof error === "string" ? error : error?.message}
+                  {typeof error === 'string' ? error : error?.message}
                 </p>
               ))}
 
@@ -104,7 +104,7 @@ export function JoinForm() {
               {/* Exibe erros de validação */}
               {field.state.meta.errors.map((error, i) => (
                 <p key={i} className="text-red-500 text-sm">
-                  {typeof error === "string" ? error : error?.message}
+                  {typeof error === 'string' ? error : error?.message}
                 </p>
               ))}
             </div>
@@ -119,7 +119,7 @@ export function JoinForm() {
             icon={ArrowRight}
             disabled={isSubmitting || !isFormValid}
           >
-            {isSubmitting ? "Entrando..." : "Entrar"}
+            {isSubmitting ? 'Entrando...' : 'Entrar'}
           </PrimaryButton>
         )}
       </form.Subscribe>

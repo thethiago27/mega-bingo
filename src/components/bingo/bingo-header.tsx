@@ -1,46 +1,43 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { RoomStatus } from "@/lib/types";
+} from '@/components/ui/dialog';
+import type { RoomStatus } from '@/lib/types';
 
 interface BingoHeaderProps {
-  salaId: string;
+  roomId: string;
   status: RoomStatus;
-  rodadaAtual?: number;
+  currentRound?: number;
 }
 
 export default function BingoHeader({
-  salaId,
+  roomId,
   status,
-  rodadaAtual,
+  currentRound,
 }: BingoHeaderProps) {
   const router = useRouter();
 
-  function handleBack() {
-    router.push("/");
-  }
-
   const handleExit = () => {
-    router.push("/");
+    router.push('/');
   };
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
       <div className="flex items-center px-4 h-16 justify-between max-w-md mx-auto w-full">
         <Dialog>
-          <DialogTrigger>
+          <DialogTrigger asChild>
             <button
+              type="button"
               aria-label="Voltar"
               className="text-gray-900 dark:text-white flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             >
@@ -55,22 +52,22 @@ export default function BingoHeader({
               Deseja realmente voltar para a tela inicial?
             </DialogDescription>
             <DialogFooter>
-              <Button onClick={handleBack}>Voltar</Button>
+              <Button onClick={handleExit}>Voltar</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
         <div className="flex flex-col items-center">
           <h2 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight">
-            Sala #{salaId}
+            Sala #{roomId}
           </h2>
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-blue-500">{status}</span>
-            {rodadaAtual && (
+            {currentRound && (
               <>
                 <span className="text-xs text-gray-400">•</span>
                 <span className="text-xs font-medium text-gray-500">
-                  Rodada {rodadaAtual}
+                  Rodada {currentRound}
                 </span>
               </>
             )}
@@ -78,9 +75,9 @@ export default function BingoHeader({
         </div>
 
         <Dialog>
-          <DialogTrigger>
+          <DialogTrigger asChild>
             <button
-              onClick={handleExit}
+              type="button"
               className="flex items-center justify-center h-10 px-3 rounded-full text-red-500 hover:bg-red-500/10 transition-colors"
             >
               <span className="text-sm font-bold">Sair</span>

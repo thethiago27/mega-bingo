@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import AdminRoomPage from './page';
-import * as databaseModule from '@/lib/database';
 import * as nextNavigation from 'next/navigation';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import * as databaseModule from '@/lib/database';
+import AdminRoomPage from './page';
 
 // Mock Firebase before any imports
 vi.mock('@/lib/firebase', () => ({
@@ -46,10 +46,10 @@ describe('AdminRoomPage', () => {
       mockListenPlayers
     );
     vi.spyOn(databaseModule, 'drawNumber').mockImplementation(mockDrawNumber);
-    vi.spyOn(databaseModule, 'registrarVencedor').mockImplementation(
+    vi.spyOn(databaseModule, 'registerWinner').mockImplementation(
       mockRegistrarVencedor
     );
-    vi.spyOn(databaseModule, 'iniciarNovaRodada').mockImplementation(
+    vi.spyOn(databaseModule, 'startNewRound').mockImplementation(
       mockIniciarNovaRodada
     );
   });
@@ -98,7 +98,7 @@ describe('AdminRoomPage', () => {
 
   describe('Error Handling', () => {
     it('should show error when room is not found', async () => {
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(null);
         return vi.fn();
       });
@@ -112,7 +112,7 @@ describe('AdminRoomPage', () => {
     });
 
     it('should show error message when room does not exist', async () => {
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(null);
         return vi.fn();
       });
@@ -126,7 +126,7 @@ describe('AdminRoomPage', () => {
     });
 
     it('should show back to dashboard button on error', async () => {
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(null);
         return vi.fn();
       });
@@ -143,7 +143,7 @@ describe('AdminRoomPage', () => {
 
     it('should navigate to admin dashboard when back button clicked', async () => {
       const user = userEvent.setup();
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(null);
         return vi.fn();
       });
@@ -168,19 +168,19 @@ describe('AdminRoomPage', () => {
     it('should display room information when loaded', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [1, 2, 3],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [1, 2, 3],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -195,19 +195,19 @@ describe('AdminRoomPage', () => {
     it('should display room code prominently', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -222,34 +222,34 @@ describe('AdminRoomPage', () => {
     it('should display player count', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: Array.from({ length: 20 }, (_, i) => i + 1),
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: Array.from({ length: 20 }, (_, i) => i + 1),
+          markedNumbers: [],
         },
         'player-2': {
           id: 'player-2',
-          nome: 'Bob',
-          cartela: Array.from({ length: 20 }, (_, i) => i + 21),
-          numerosMarcados: [],
+          name: 'Bob',
+          cardNumbers: Array.from({ length: 20 }, (_, i) => i + 21),
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -264,19 +264,19 @@ describe('AdminRoomPage', () => {
     it('should display drawn numbers count', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [1, 2, 3, 4, 5],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [1, 2, 3, 4, 5],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -293,19 +293,19 @@ describe('AdminRoomPage', () => {
     it('should display draw number button', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -323,19 +323,19 @@ describe('AdminRoomPage', () => {
       const user = userEvent.setup();
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -359,19 +359,19 @@ describe('AdminRoomPage', () => {
       const user = userEvent.setup();
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -397,19 +397,19 @@ describe('AdminRoomPage', () => {
     it('should display last drawn number', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [1, 2, 3, 42],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [1, 2, 3, 42],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -429,19 +429,19 @@ describe('AdminRoomPage', () => {
       const allNumbers = Array.from({ length: 100 }, (_, i) => i + 1);
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: allNumbers,
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: allNumbers,
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -460,19 +460,19 @@ describe('AdminRoomPage', () => {
       const allNumbers = Array.from({ length: 100 }, (_, i) => i + 1);
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: allNumbers,
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: allNumbers,
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -490,19 +490,19 @@ describe('AdminRoomPage', () => {
       const user = userEvent.setup();
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -529,19 +529,19 @@ describe('AdminRoomPage', () => {
     it('should show message when no players', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -558,28 +558,28 @@ describe('AdminRoomPage', () => {
     it('should display player names', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: Array.from({ length: 20 }, (_, i) => i + 1),
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: Array.from({ length: 20 }, (_, i) => i + 1),
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -594,31 +594,31 @@ describe('AdminRoomPage', () => {
     it('should display player progress', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [1, 2, 3],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [1, 2, 3],
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: [
+          name: 'Alice',
+          cardNumbers: [
             1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
             20,
           ],
-          numerosMarcados: [],
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -633,31 +633,31 @@ describe('AdminRoomPage', () => {
     it('should show progress bar for each player', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [1, 2, 3],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [1, 2, 3],
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: [
+          name: 'Alice',
+          cardNumbers: [
             1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
             20,
           ],
-          numerosMarcados: [],
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -678,28 +678,28 @@ describe('AdminRoomPage', () => {
       const drawnNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: drawnNumbers,
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: drawnNumbers,
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: drawnNumbers,
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: drawnNumbers,
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -717,28 +717,28 @@ describe('AdminRoomPage', () => {
       const drawnNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: drawnNumbers,
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: drawnNumbers,
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: drawnNumbers,
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: drawnNumbers,
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -754,34 +754,34 @@ describe('AdminRoomPage', () => {
       const drawnNumbers = Array.from({ length: 40 }, (_, i) => i + 1);
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: drawnNumbers,
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: drawnNumbers,
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: Array.from({ length: 20 }, (_, i) => i + 1),
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: Array.from({ length: 20 }, (_, i) => i + 1),
+          markedNumbers: [],
         },
         'player-2': {
           id: 'player-2',
-          nome: 'Bob',
-          cartela: Array.from({ length: 20 }, (_, i) => i + 21),
-          numerosMarcados: [],
+          name: 'Bob',
+          cardNumbers: Array.from({ length: 20 }, (_, i) => i + 21),
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -799,28 +799,28 @@ describe('AdminRoomPage', () => {
       const drawnNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: drawnNumbers,
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: drawnNumbers,
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: drawnNumbers,
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: drawnNumbers,
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -841,16 +841,16 @@ describe('AdminRoomPage', () => {
       const drawnNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: drawnNumbers,
-        rodadaAtual: 1,
-        vencedores: [
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: drawnNumbers,
+        currentRound: 1,
+        winners: [
           {
-            jogadorId: 'player-1',
-            nome: 'Alice',
-            rodada: 1,
+            playerId: 'player-1',
+            name: 'Alice',
+            round: 1,
             timestamp: Date.now(),
           },
         ],
@@ -859,17 +859,17 @@ describe('AdminRoomPage', () => {
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: drawnNumbers,
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: drawnNumbers,
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -887,28 +887,28 @@ describe('AdminRoomPage', () => {
       const drawnNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: drawnNumbers,
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: drawnNumbers,
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: drawnNumbers,
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: drawnNumbers,
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -928,15 +928,15 @@ describe('AdminRoomPage', () => {
     it('should display current round number', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 3,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 3,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
@@ -953,28 +953,28 @@ describe('AdminRoomPage', () => {
       const drawnNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: drawnNumbers,
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: drawnNumbers,
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: drawnNumbers,
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: drawnNumbers,
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -993,28 +993,28 @@ describe('AdminRoomPage', () => {
       const drawnNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: drawnNumbers,
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: drawnNumbers,
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: drawnNumbers,
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: drawnNumbers,
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -1039,22 +1039,22 @@ describe('AdminRoomPage', () => {
     it('should display total winners count', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 3,
-        vencedores: [
-          { jogadorId: 'p1', nome: 'Alice', rodada: 1, timestamp: Date.now() },
-          { jogadorId: 'p2', nome: 'Bob', rodada: 2, timestamp: Date.now() },
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 3,
+        winners: [
+          { playerId: 'p1', name: 'Alice', round: 1, timestamp: Date.now() },
+          { playerId: 'p2', name: 'Bob', round: 2, timestamp: Date.now() },
         ],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -1073,19 +1073,19 @@ describe('AdminRoomPage', () => {
     it('should display statistics section', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -1100,28 +1100,28 @@ describe('AdminRoomPage', () => {
     it('should display correct statistics', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [1, 2, 3, 4, 5],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [1, 2, 3, 4, 5],
+        currentRound: 1,
+        winners: [],
       };
 
       const mockJogadores = {
         'player-1': {
           id: 'player-1',
-          nome: 'Alice',
-          cartela: Array.from({ length: 20 }, (_, i) => i + 1),
-          numerosMarcados: [],
+          name: 'Alice',
+          cardNumbers: Array.from({ length: 20 }, (_, i) => i + 1),
+          markedNumbers: [],
         },
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback(mockJogadores);
         return vi.fn();
       });
@@ -1129,7 +1129,7 @@ describe('AdminRoomPage', () => {
       render(<AdminRoomPage />);
 
       await waitFor(() => {
-        expect(screen.getByText('5/100')).toBeInTheDocument();
+        expect(screen.getByText('5/60')).toBeInTheDocument();
       });
     });
   });
@@ -1138,19 +1138,19 @@ describe('AdminRoomPage', () => {
     it('should show message when no numbers drawn', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -1167,19 +1167,19 @@ describe('AdminRoomPage', () => {
     it('should display all drawn numbers', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [11, 22, 33, 44, 54],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [11, 22, 33, 44, 54],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -1203,19 +1203,19 @@ describe('AdminRoomPage', () => {
     it('should show back to dashboard button', async () => {
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -1233,19 +1233,19 @@ describe('AdminRoomPage', () => {
       const user = userEvent.setup();
       const mockSala = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [],
+        currentRound: 1,
+        winners: [],
       };
 
-      mockListenRoom.mockImplementation((roomId, callback) => {
+      mockListenRoom.mockImplementation((_roomId, callback) => {
         callback(mockSala);
         return vi.fn();
       });
-      mockListenPlayers.mockImplementation((roomId, callback) => {
+      mockListenPlayers.mockImplementation((_roomId, callback) => {
         callback({});
         return vi.fn();
       });
@@ -1282,20 +1282,20 @@ describe('AdminRoomPage', () => {
     });
 
     it('should update when room data changes', async () => {
-      type SalaCallback = (sala: databaseModule.Sala | null) => void;
+      type SalaCallback = (sala: databaseModule.Room | null) => void;
       type JogadoresCallback = (
-        jogadores: Record<string, databaseModule.Jogador>
+        jogadores: Record<string, databaseModule.Player>
       ) => void;
-      let roomCallback: SalaCallback | null = null;
+      let roomCallback: SalaCallback = () => {};
 
       mockListenRoom.mockImplementation(
-        (roomId: string, callback: SalaCallback) => {
+        (_roomId: string, callback: SalaCallback) => {
           roomCallback = callback;
           return vi.fn();
         }
       );
       mockListenPlayers.mockImplementation(
-        (roomId: string, callback: JogadoresCallback) => {
+        (_roomId: string, callback: JogadoresCallback) => {
           callback({});
           return vi.fn();
         }
@@ -1303,28 +1303,30 @@ describe('AdminRoomPage', () => {
 
       render(<AdminRoomPage />);
 
-      const initialSala: databaseModule.Sala = {
+      const initialSala: databaseModule.Room = {
         id: 'TEST123',
-        nome: 'Test Room',
-        criadoEm: Date.now(),
-        ativa: true,
-        numerosSorteados: [1],
-        rodadaAtual: 1,
-        vencedores: [],
+        name: 'Test Room',
+        adminId: 'admin-1',
+        createdAt: Date.now(),
+        gameState: 'in_progress',
+        drawnNumbers: [1],
+        currentRound: 1,
+        winners: [],
+        players: {},
       };
 
-      roomCallback!(initialSala);
+      roomCallback(initialSala);
 
       await waitFor(() => {
         expect(screen.getByText(/1 número/)).toBeInTheDocument();
       });
 
-      const updatedSala: databaseModule.Sala = {
+      const updatedSala: databaseModule.Room = {
         ...initialSala,
-        numerosSorteados: [1, 2, 3],
+        drawnNumbers: [1, 2, 3],
       };
 
-      roomCallback!(updatedSala);
+      roomCallback(updatedSala);
 
       await waitFor(() => {
         expect(screen.getByText(/3 número/)).toBeInTheDocument();

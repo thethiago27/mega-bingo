@@ -1,6 +1,6 @@
-import AppHeader from "@/components/AppHeader";
-import HeroSection from "@/components/bingo/hero-section";
-import { JoinForm } from "./components/join-form";
+import AppHeader from '@/components/AppHeader';
+import HeroSection from '@/components/bingo/hero-section';
+import { JoinForm } from './components/join-form';
 
 export default function EntrarPage() {
   return (
@@ -18,7 +18,7 @@ export default function EntrarPage() {
           <JoinForm />
         </div>
 
-        <div className="flex-1 min-h-[40px]"></div>
+        <div className="flex-1 min-h-10"></div>
       </main>
     </div>
   );

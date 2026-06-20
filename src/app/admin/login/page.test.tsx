@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import AdminLoginPage from './page';
-import * as useAdminAuthModule from '@/hooks/use-admin-auth';
 import * as nextNavigation from 'next/navigation';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as useAdminAuthModule from '@/hooks/use-admin-auth';
+import AdminLoginPage from './page';
 
 // Mock Firebase before any imports
 vi.mock('@/lib/firebase', () => ({

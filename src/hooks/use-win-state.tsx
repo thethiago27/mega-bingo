@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
+import { useMemo } from 'react';
 import {
-  WinState as WinStateEnum,
   calculateWinState,
   getAnimationClasses,
-} from "@/lib/animation-utils";
+  type WinState as WinStateEnum,
+} from '@/lib/animation-utils';
 
 export interface WinState {
   state: WinStateEnum;
@@ -17,7 +17,7 @@ export interface WinState {
 
 export function useWinState(
   totalNumbers: number,
-  markedNumbers: number,
+  markedNumbers: number
 ): WinState {
   return useMemo(() => {
     const percentage =

@@ -1,30 +1,35 @@
-import { Sala, addPlayer, listenRoom, listenPlayers } from '@/lib/database';
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { markNumber } from '@/lib/database';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  addPlayer,
+  listenPlayers,
+  listenRoom,
+  markNumber,
+  type Room,
+} from '@/lib/database';
 
 interface UseRoomReturn {
-  sala: Sala | null;
-  jogadorId: string | null;
-  cartela: number[];
-  numerosMarcados: number[];
-  numerosSorteados: number[];
+  room: Room | null;
+  playerId: string | null;
+  cardNumbers: number[];
+  markedNumbers: number[];
+  drawnNumbers: number[];
   loading: boolean;
   error: string | null;
   isBingo: boolean;
-  totalNumeros: number;
+  totalNumbers: number;
   currentNumber: number | null;
-  handleMarkNumber: (numero: number) => void;
+  handleMarkNumber: (number: number) => void;
 }
 
 function calculateMarkedNumbers(
-  cartela: number[],
-  numerosSorteados: number[]
+  cardNumbers: number[],
+  drawnNumbers: number[]
 ): number[] {
-  return cartela.filter((num) => numerosSorteados.includes(num));
+  return cardNumbers.filter((num) => drawnNumbers.includes(num));
 }
 
-// Funções para gerenciar jogadorId no localStorage
+// Helpers to persist the playerId in localStorage
 function getStoredPlayerId(roomId: string, playerName: string): string | null {
   if (typeof window === 'undefined') return null;
   const key = `player-${roomId}-${playerName}`;
@@ -44,11 +49,11 @@ function setStoredPlayerId(
 export function useRoom(roomId: string): UseRoomReturn {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nome = searchParams.get('nome');
+  const name = searchParams.get('name');
 
-  const [sala, setSala] = useState<Sala | null>(null);
-  const [jogadorId, setJogadorId] = useState<string | null>(null);
-  const [cartela, setCartela] = useState<number[]>([]);
+  const [room, setRoom] = useState<Room | null>(null);
+  const [playerId, setPlayerId] = useState<string | null>(null);
+  const [cardNumbers, setCardNumbers] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,32 +61,32 @@ export function useRoom(roomId: string): UseRoomReturn {
 
   // Redirect if no name
   useEffect(() => {
-    if (!nome && !loading) {
+    if (!name && !loading) {
       router.push('/entrar');
     }
-  }, [nome, router, loading]);
+  }, [name, router, loading]);
 
   // Initialize player
   useEffect(() => {
-    if (!nome || isInitialized.current) return;
+    if (!name || isInitialized.current) return;
 
     isInitialized.current = true;
 
     const initPlayer = async () => {
       try {
-        const storedPlayerId = getStoredPlayerId(roomId, nome);
+        const storedPlayerId = getStoredPlayerId(roomId, name);
 
         if (storedPlayerId) {
-          setJogadorId(storedPlayerId);
+          setPlayerId(storedPlayerId);
           setLoading(false);
           return;
         }
 
-        const playerId = await addPlayer(roomId, nome);
+        const newPlayerId = await addPlayer(roomId, name);
 
-        setStoredPlayerId(roomId, nome, playerId);
+        setStoredPlayerId(roomId, name, newPlayerId);
 
-        setJogadorId(playerId);
+        setPlayerId(newPlayerId);
         setLoading(false);
       } catch {
         setError('Não foi possível entrar na sala. Tente novamente.');
@@ -90,35 +95,35 @@ export function useRoom(roomId: string): UseRoomReturn {
     };
 
     initPlayer();
-  }, [roomId, nome, router]);
+  }, [roomId, name]);
 
   useEffect(() => {
-    if (!jogadorId) return;
+    if (!playerId) return;
 
-    const unsubscribe = listenPlayers(roomId, (jogadores) => {
-      const jogador = jogadores[jogadorId];
+    const unsubscribe = listenPlayers(roomId, (players) => {
+      const player = players[playerId];
 
-      if (!jogador) {
-        if (nome) {
-          localStorage.removeItem(`player-${roomId}-${nome}`);
+      if (!player) {
+        if (name) {
+          localStorage.removeItem(`player-${roomId}-${name}`);
         }
         return;
       }
 
-      const cartelaFirebase = jogador.cartela || [];
+      const cardFromFirebase = player.cardNumbers || [];
 
-      if (cartelaFirebase.length > 0) {
-        setCartela(cartelaFirebase);
+      if (cardFromFirebase.length > 0) {
+        setCardNumbers(cardFromFirebase);
       }
     });
 
     return () => unsubscribe();
-  }, [roomId, jogadorId, nome]);
+  }, [roomId, playerId, name]);
 
   useEffect(() => {
-    const unsubscribe = listenRoom(roomId, (salaData) => {
-      if (salaData) {
-        setSala(salaData);
+    const unsubscribe = listenRoom(roomId, (roomData) => {
+      if (roomData) {
+        setRoom(roomData);
       } else {
         setError('Sala não encontrada');
       }
@@ -128,55 +133,55 @@ export function useRoom(roomId: string): UseRoomReturn {
   }, [roomId]);
 
   const handleMarkNumber = useCallback(
-    async (numero: number) => {
-      if (!jogadorId) return;
+    async (number: number) => {
+      if (!playerId) return;
 
       try {
-        await markNumber(roomId, jogadorId, numero);
+        await markNumber(roomId, playerId, number);
       } catch {
         // Silently fail
       }
     },
-    [jogadorId, roomId]
+    [playerId, roomId]
   );
 
-  const numerosSorteados = useMemo(
-    () => sala?.numerosSorteados || [],
-    [sala?.numerosSorteados]
+  const drawnNumbers = useMemo(
+    () => room?.drawnNumbers || [],
+    [room?.drawnNumbers]
   );
 
-  const numerosMarcados = useMemo(
+  const markedNumbers = useMemo(
     () =>
-      cartela.length > 0
-        ? calculateMarkedNumbers(cartela, numerosSorteados)
+      cardNumbers.length > 0
+        ? calculateMarkedNumbers(cardNumbers, drawnNumbers)
         : [],
-    [cartela, numerosSorteados]
+    [cardNumbers, drawnNumbers]
   );
 
   const isBingo = useMemo(
-    () => cartela.length > 0 && numerosMarcados.length === cartela.length,
-    [cartela.length, numerosMarcados.length]
+    () => cardNumbers.length > 0 && markedNumbers.length === cardNumbers.length,
+    [cardNumbers.length, markedNumbers.length]
   );
 
   const currentNumber = useMemo(
     () =>
-      numerosSorteados && numerosSorteados.length > 0
-        ? numerosSorteados[numerosSorteados.length - 1]
+      drawnNumbers && drawnNumbers.length > 0
+        ? drawnNumbers[drawnNumbers.length - 1]
         : null,
-    [numerosSorteados]
+    [drawnNumbers]
   );
 
   return {
-    numerosSorteados,
-    sala,
-    jogadorId,
-    cartela,
+    drawnNumbers,
+    room,
+    playerId,
+    cardNumbers,
     currentNumber,
-    numerosMarcados,
+    markedNumbers,
     loading,
     error,
     isBingo,
     handleMarkNumber,
-    totalNumeros: cartela.length,
+    totalNumbers: cardNumbers.length,
   };
 }

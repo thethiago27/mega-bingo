@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fc from 'fast-check';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock Firebase modules
 vi.mock('@/lib/firebase-utils', () => ({
@@ -20,7 +20,8 @@ vi.mock('firebase/database', () => ({
 }));
 
 vi.mock('@/lib/bingo', () => ({
-  gerarCartela: vi.fn(() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+  generateCard: vi.fn(() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+  MAX_NUMBER: 60,
 }));
 
 import { drawNumber } from './database';
@@ -43,7 +44,7 @@ describe('database.ts', () => {
       const allNumbers = Array.from({ length: 60 }, (_, i) => i + 1);
       mockGet.mockResolvedValue({
         exists: () => true,
-        val: () => ({ numerosSorteados: allNumbers }),
+        val: () => ({ drawnNumbers: allNumbers }),
       });
 
       const result = await drawNumber('test-room');
@@ -55,7 +56,7 @@ describe('database.ts', () => {
     it('should draw a number between 1 and 60', async () => {
       mockGet.mockResolvedValue({
         exists: () => true,
-        val: () => ({ numerosSorteados: [] }),
+        val: () => ({ drawnNumbers: [] }),
       });
       mockUpdate.mockResolvedValue(undefined);
 
@@ -69,7 +70,7 @@ describe('database.ts', () => {
       const alreadyDrawn = [1, 2, 3, 4, 5];
       mockGet.mockResolvedValue({
         exists: () => true,
-        val: () => ({ numerosSorteados: alreadyDrawn }),
+        val: () => ({ drawnNumbers: alreadyDrawn }),
       });
       mockUpdate.mockResolvedValue(undefined);
 
@@ -82,21 +83,21 @@ describe('database.ts', () => {
     it('should update the room with the new drawn number', async () => {
       mockGet.mockResolvedValue({
         exists: () => true,
-        val: () => ({ numerosSorteados: [10, 20, 30] }),
+        val: () => ({ drawnNumbers: [10, 20, 30] }),
       });
       mockUpdate.mockResolvedValue(undefined);
 
       const result = await drawNumber('test-room');
 
       expect(mockUpdate).toHaveBeenCalledWith('mockRef', {
-        numerosSorteados: expect.arrayContaining([10, 20, 30, result]),
+        drawnNumbers: expect.arrayContaining([10, 20, 30, result]),
       });
     });
 
-    it('should handle empty numerosSorteados array', async () => {
+    it('should handle empty drawnNumbers array', async () => {
       mockGet.mockResolvedValue({
         exists: () => true,
-        val: () => ({ numerosSorteados: undefined }),
+        val: () => ({ drawnNumbers: undefined }),
       });
       mockUpdate.mockResolvedValue(undefined);
 
@@ -117,7 +118,7 @@ describe('database.ts', () => {
           async (existingNumbers) => {
             mockGet.mockResolvedValue({
               exists: () => true,
-              val: () => ({ numerosSorteados: existingNumbers }),
+              val: () => ({ drawnNumbers: existingNumbers }),
             });
             mockUpdate.mockResolvedValue(undefined);
 
@@ -145,7 +146,7 @@ describe('database.ts', () => {
           async (existingNumbers) => {
             mockGet.mockResolvedValue({
               exists: () => true,
-              val: () => ({ numerosSorteados: existingNumbers }),
+              val: () => ({ drawnNumbers: existingNumbers }),
             });
             mockUpdate.mockResolvedValue(undefined);
 
@@ -163,7 +164,7 @@ describe('database.ts', () => {
       const exactly60Numbers = Array.from({ length: 60 }, (_, i) => i + 1);
       mockGet.mockResolvedValue({
         exists: () => true,
-        val: () => ({ numerosSorteados: exactly60Numbers }),
+        val: () => ({ drawnNumbers: exactly60Numbers }),
       });
 
       const result = await drawNumber('test-room');
@@ -175,7 +176,7 @@ describe('database.ts', () => {
       const numbers59 = Array.from({ length: 59 }, (_, i) => i + 1);
       mockGet.mockResolvedValue({
         exists: () => true,
-        val: () => ({ numerosSorteados: numbers59 }),
+        val: () => ({ drawnNumbers: numbers59 }),
       });
       mockUpdate.mockResolvedValue(undefined);
 

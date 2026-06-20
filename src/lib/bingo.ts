@@ -1,17 +1,23 @@
-export function gerarCartela(): number[] {
-  const numeros = new Set<number>();
+/** Highest number that can be drawn (numbers range from 1 to MAX_NUMBER). */
+export const MAX_NUMBER = 60;
 
-  while (numeros.size < 10) {
-    const numero = Math.floor(Math.random() * 60) + 1;
-    numeros.add(numero);
+/** How many numbers each player's card holds. */
+export const CARD_SIZE = 10;
+
+export function generateCard(): number[] {
+  const numbers = new Set<number>();
+
+  while (numbers.size < CARD_SIZE) {
+    const number = Math.floor(Math.random() * MAX_NUMBER) + 1;
+    numbers.add(number);
   }
 
-  return Array.from(numeros).sort((a, b) => a - b);
+  return Array.from(numbers).sort((a, b) => a - b);
 }
 
-export function verificarBingo(
-  cartela: number[],
-  numerosSorteados: number[]
+export function checkBingo(
+  cardNumbers: number[],
+  drawnNumbers: number[]
 ): boolean {
-  return cartela.every((num) => numerosSorteados.includes(num));
+  return cardNumbers.every((num) => drawnNumbers.includes(num));
 }

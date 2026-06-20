@@ -1,10 +1,10 @@
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 
 export function RoomNotFound() {
   const router = useRouter();
 
   function redirectToHome() {
-    router.push("/");
+    router.push('/');
   }
 
   return (
@@ -14,6 +14,7 @@ export function RoomNotFound() {
           Sala não encontrada
         </p>
         <button
+          type="button"
           onClick={redirectToHome}
           className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
         >

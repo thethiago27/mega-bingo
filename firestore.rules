@@ -1,18 +1,12 @@
 rules_version = '2';
+
+// This project uses the Realtime Database (see database.rules.json), not
+// Firestore. Deny all Firestore access so an unused, wide-open ruleset can't
+// be deployed by accident.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /salas/{salaId} {
-      allow read: if true;
-      allow create: if true;
-      allow update: if true;
-      allow delete: if true;
-      
-      match /jogadores/{jogadorId} {
-        allow read: if true;
-        allow create: if true;
-        allow update: if true;
-        allow delete: if true;
-      }
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

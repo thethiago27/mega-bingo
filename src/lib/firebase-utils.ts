@@ -1,7 +1,7 @@
-import { ref, get, Database } from "firebase/database";
-import { db, auth } from "@/lib/firebase";
-import { Sala } from "@/lib/types";
-import { Auth } from "firebase/auth";
+import type { Auth } from 'firebase/auth';
+import { type Database, get, ref } from 'firebase/database';
+import { auth, db } from '@/lib/firebase';
+import type { Room } from '@/lib/types';
 
 /**
  * Safely get database instance
@@ -9,7 +9,7 @@ import { Auth } from "firebase/auth";
  */
 export function getDb(): Database {
   if (!db) {
-    throw new Error("Firebase Database is not initialized");
+    throw new Error('Firebase Database is not initialized');
   }
   return db;
 }
@@ -20,7 +20,7 @@ export function getDb(): Database {
  */
 export function getAuth(): Auth {
   if (!auth) {
-    throw new Error("Firebase Auth is not initialized");
+    throw new Error('Firebase Auth is not initialized');
   }
   return auth;
 }
@@ -29,20 +29,20 @@ export function getAuth(): Auth {
  * Safely loads all rooms from Firebase
  * Returns empty array if Firebase is not initialized (SSR/build time)
  */
-export async function loadSalas(): Promise<Sala[]> {
+export async function loadRooms(): Promise<Room[]> {
   // Return empty array if Firebase is not initialized
   if (!db) {
     return [];
   }
 
   try {
-    const salasRef = ref(db, "salas");
-    const snapshot = await get(salasRef);
+    const roomsRef = ref(db, 'rooms');
+    const snapshot = await get(roomsRef);
 
     if (snapshot.exists()) {
-      const salasData = snapshot.val();
-      return Object.entries(salasData).map(([id, sala]: [string, unknown]) => ({
-        ...(sala as Omit<Sala, "id">),
+      const roomsData = snapshot.val();
+      return Object.entries(roomsData).map(([id, room]: [string, unknown]) => ({
+        ...(room as Omit<Room, 'id'>),
         id,
       }));
     }
@@ -58,19 +58,19 @@ export async function loadSalas(): Promise<Sala[]> {
  * Check if Firebase is initialized and ready to use
  */
 export function isFirebaseReady(): boolean {
-  return typeof window !== "undefined" && !!db && !!auth;
+  return typeof window !== 'undefined' && !!db && !!auth;
 }
 
 /**
  * Check if Firebase Database is initialized
  */
 export function isDbReady(): boolean {
-  return typeof window !== "undefined" && !!db;
+  return typeof window !== 'undefined' && !!db;
 }
 
 /**
  * Check if Firebase Auth is initialized
  */
 export function isAuthReady(): boolean {
-  return typeof window !== "undefined" && !!auth;
+  return typeof window !== 'undefined' && !!auth;
 }

@@ -1,20 +1,20 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
-  listenRoom,
-  listenPlayers,
   drawNumber,
-  registrarVencedor,
-  iniciarNovaRodada,
-  Sala as SalaDB,
-  Jogador as JogadorDB,
+  listenPlayers,
+  listenRoom,
+  type Player,
+  type Room,
+  registerWinner,
+  startNewRound,
 } from '@/lib/database';
-import { RoomHeader } from './RoomHeader';
+import { DrawnNumbersGrid } from './DrawnNumbersGrid';
 import { NumberDrawer } from './NumberDrawer';
 import { PlayersList } from './PlayersList';
-import { DrawnNumbersGrid } from './DrawnNumbersGrid';
+import { RoomHeader } from './RoomHeader';
 import { RoomStats } from './RoomStats';
 
 export function AdminRoomContent() {
@@ -22,17 +22,17 @@ export function AdminRoomContent() {
   const router = useRouter();
   const roomId = params.roomId as string;
 
-  const [sala, setSala] = useState<SalaDB | null>(null);
-  const [jogadores, setJogadores] = useState<Record<string, JogadorDB>>({});
+  const [room, setRoom] = useState<Room | null>(null);
+  const [players, setPlayers] = useState<Record<string, Player>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [drawing, setDrawing] = useState(false);
   const [startingNewRound, setStartingNewRound] = useState(false);
 
   useEffect(() => {
-    const unsubscribeRoom = listenRoom(roomId, (salaData) => {
-      if (salaData) {
-        setSala(salaData);
+    const unsubscribeRoom = listenRoom(roomId, (roomData) => {
+      if (roomData) {
+        setRoom(roomData);
         setError(null);
       } else {
         setError('Sala não encontrada');
@@ -40,8 +40,8 @@ export function AdminRoomContent() {
       setLoading(false);
     });
 
-    const unsubscribePlayers = listenPlayers(roomId, (jogadoresData) => {
-      setJogadores(jogadoresData);
+    const unsubscribePlayers = listenPlayers(roomId, (playersData) => {
+      setPlayers(playersData);
     });
 
     return () => {
@@ -50,38 +50,36 @@ export function AdminRoomContent() {
     };
   }, [roomId]);
 
-  const numerosSorteados = sala?.numerosSorteados || [];
-  const rodadaAtual = sala?.rodadaAtual || 1;
+  const drawnNumbers = room?.drawnNumbers || [];
+  const currentRound = room?.currentRound || 1;
 
-  const jogadoresArray = Object.entries(jogadores).map(
-    ([playerId, jogador]) => ({
-      playerId,
-      ...jogador,
-    })
-  );
+  const playersArray = Object.entries(players).map(([playerId, player]) => ({
+    playerId,
+    ...player,
+  }));
 
-  const vencedoresRodadaAtual = jogadoresArray.filter((jogador) => {
-    const numerosMarcados = jogador.cartela.filter((num) =>
-      numerosSorteados.includes(num)
+  const roundWinners = playersArray.filter((player) => {
+    const markedNumbers = player.cardNumbers.filter((num) =>
+      drawnNumbers.includes(num)
     );
-    return numerosMarcados.length === jogador.cartela.length;
+    return markedNumbers.length === player.cardNumbers.length;
   });
 
   useEffect(() => {
-    if (vencedoresRodadaAtual.length > 0 && sala) {
-      const vencedoresJaRegistrados = sala.vencedores || [];
+    if (roundWinners.length > 0 && room) {
+      const registeredWinners = room.winners || [];
 
-      for (const vencedor of vencedoresRodadaAtual) {
-        const jaRegistrado = vencedoresJaRegistrados.some(
-          (v) => v.jogadorId === vencedor.playerId && v.rodada === rodadaAtual
+      for (const winner of roundWinners) {
+        const alreadyRegistered = registeredWinners.some(
+          (w) => w.playerId === winner.playerId && w.round === currentRound
         );
 
-        if (!jaRegistrado) {
-          registrarVencedor(roomId, vencedor.playerId, vencedor.nome);
+        if (!alreadyRegistered) {
+          registerWinner(roomId, winner.playerId, winner.name);
         }
       }
     }
-  }, [vencedoresRodadaAtual, sala, roomId, rodadaAtual]);
+  }, [roundWinners, room, roomId, currentRound]);
 
   const handleDrawNumber = useCallback(async () => {
     setDrawing(true);
@@ -97,7 +95,7 @@ export function AdminRoomContent() {
   const handleNewRound = useCallback(async () => {
     setStartingNewRound(true);
     try {
-      await iniciarNovaRodada(roomId);
+      await startNewRound(roomId);
     } catch {
       setError('Erro ao iniciar nova rodada');
     } finally {
@@ -120,7 +118,7 @@ export function AdminRoomContent() {
     );
   }
 
-  if (error || !sala) {
+  if (error || !room) {
     return (
       <div className="max-w-2xl mx-auto">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
@@ -132,6 +130,7 @@ export function AdminRoomContent() {
               'Sala não encontrada. Verifique o código e tente novamente.'}
           </p>
           <button
+            type="button"
             onClick={handleGoBack}
             className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition"
           >
@@ -142,18 +141,17 @@ export function AdminRoomContent() {
     );
   }
 
-  const playerCount = Object.keys(jogadores).length;
+  const playerCount = Object.keys(players).length;
   const currentNumber =
-    numerosSorteados.length > 0
-      ? numerosSorteados[numerosSorteados.length - 1]
-      : null;
+    drawnNumbers.length > 0 ? drawnNumbers[drawnNumbers.length - 1] : null;
 
-  const hasWinner = vencedoresRodadaAtual.length > 0;
+  const hasWinner = roundWinners.length > 0;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <button
+          type="button"
           onClick={handleGoBack}
           className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
         >
@@ -177,9 +175,9 @@ export function AdminRoomContent() {
       <RoomHeader
         roomId={roomId}
         playerCount={playerCount}
-        numerosSorteados={numerosSorteados}
-        vencedores={vencedoresRodadaAtual}
-        rodadaAtual={rodadaAtual}
+        drawnNumbers={drawnNumbers}
+        winners={roundWinners}
+        currentRound={currentRound}
         onNewRound={handleNewRound}
         startingNewRound={startingNewRound}
         hasWinner={hasWinner}
@@ -190,28 +188,28 @@ export function AdminRoomContent() {
           <NumberDrawer
             currentNumber={currentNumber}
             drawing={drawing}
-            numerosSorteados={numerosSorteados}
+            drawnNumbers={drawnNumbers}
             onDrawNumber={handleDrawNumber}
             disabled={hasWinner}
           />
 
           <RoomStats
             playerCount={playerCount}
-            numerosSorteados={numerosSorteados}
-            vencedores={vencedoresRodadaAtual}
-            rodadaAtual={rodadaAtual}
-            totalVencedores={sala.vencedores?.length || 0}
+            drawnNumbers={drawnNumbers}
+            winners={roundWinners}
+            currentRound={currentRound}
+            totalWinners={room.winners?.length || 0}
           />
         </div>
 
         <div className="lg:col-span-2 space-y-6">
           <PlayersList
-            jogadores={jogadoresArray}
-            numerosSorteados={numerosSorteados}
+            players={playersArray}
+            drawnNumbers={drawnNumbers}
             roomId={roomId}
           />
 
-          <DrawnNumbersGrid numerosSorteados={numerosSorteados} />
+          <DrawnNumbersGrid drawnNumbers={drawnNumbers} />
         </div>
       </div>
     </div>

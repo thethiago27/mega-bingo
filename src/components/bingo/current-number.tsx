@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useRoom } from "@/hooks/use-room";
+import { useRoom } from '@/hooks/use-room';
 
 interface CurrentNumberProps {
   roomId: string;
-  proximoEm?: number;
+  nextDrawIn?: number;
 }
 
 export default function CurrentNumber({
   roomId,
-  proximoEm,
+  nextDrawIn,
 }: CurrentNumberProps) {
   const { currentNumber } = useRoom(roomId);
   return (
@@ -21,7 +21,7 @@ export default function CurrentNumber({
       <div className="relative flex items-center justify-center size-32 rounded-full bg-white dark:bg-gray-800 border-4 border-blue-500 shadow-lg shadow-blue-500/30 mb-2">
         <div className="absolute inset-0 rounded-full border border-gray-100 dark:border-white/10"></div>
         <span className="text-gray-900 dark:text-white text-6xl font-bold tracking-tighter">
-          {currentNumber || "--"}
+          {currentNumber || '--'}
         </span>
 
         {currentNumber && (
@@ -31,9 +31,9 @@ export default function CurrentNumber({
         )}
       </div>
 
-      {proximoEm && (
+      {nextDrawIn && (
         <p className="mt-6 text-gray-500 dark:text-gray-400 text-xs font-medium">
-          Sorteando próximo em {proximoEm}s...
+          Sorteando próximo em {nextDrawIn}s...
         </p>
       )}
     </section>

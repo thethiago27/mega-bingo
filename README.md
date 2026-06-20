@@ -31,19 +31,22 @@ Acesse: http://localhost:3000
 
 ## 📦 Estrutura
 
-- `/` - Página inicial (criar ou entrar em sala)
-- `/criar-sala` - Criar nova sala de bingo
-- `/entrar` - Entrar em uma sala existente
-- `/sala/[id]` - Tela do jogador com cartela
-- `/admin/[id]` - Tela de sorteio (admin)
+- `/` - Página inicial (jogar ou entrar como admin)
+- `/entrar` - Entrar em uma sala usando o código
+- `/entrar/[roomId]` - Entrar direto via link compartilhado
+- `/sala/[id]` - Tela do jogador com a cartela
+- `/admin/login` - Login do admin (anônimo)
+- `/admin` - Painel do admin (lista de salas)
+- `/admin/create-room` - Criar nova sala
+- `/admin/room/[roomId]` - Tela de sorteio e gerenciamento da sala
 
 ## 🎮 Como funciona
 
-1. **Admin cria sala** → Gera ID único
-2. **Jogadores entram** → Digitam nome e recebem cartela com 20 números (1-100)
+1. **Admin cria sala** → Gera ID único (o admin vira dono da sala)
+2. **Jogadores entram** → Digitam nome e recebem uma cartela com 10 números (1-60)
 3. **Admin sorteia** → Números aparecem em tempo real para todos
-4. **Jogadores marcam** → Cartela marca automaticamente
-5. **Bingo!** → Sistema detecta quando alguém completa a cartela
+4. **Jogadores marcam** → A cartela marca os números sorteados
+5. **Bingo!** → O sistema detecta quando alguém completa a cartela
 
 ## 🔥 Firebase
 
@@ -55,6 +58,10 @@ Acesse: http://localhost:3000
 ```bash
 pnpm dev              # Desenvolvimento
 pnpm build            # Build de produção
+pnpm test             # Testes (Vitest)
+pnpm typecheck        # Checagem de tipos (tsc --noEmit)
+pnpm lint             # Lint (Biome)
+pnpm check            # Lint + format com --write (Biome)
 pnpm deploy           # Deploy completo
 pnpm deploy:hosting   # Deploy apenas hosting
 pnpm deploy:database  # Deploy apenas regras do database

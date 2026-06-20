@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 
 interface AnimatedNumberProps {
   number: number;

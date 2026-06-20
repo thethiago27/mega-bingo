@@ -1,21 +1,21 @@
 'use client';
 
-import { useAdminAuth } from '@/hooks/use-admin-auth';
-import { useEffect, useState } from 'react';
-import { Sala } from '@/lib/types';
 import Link from 'next/link';
-import { loadSalas } from '@/lib/firebase-utils';
+import { useEffect, useState } from 'react';
+import { useAdminAuth } from '@/hooks/use-admin-auth';
+import { loadRooms } from '@/lib/firebase-utils';
+import type { Room } from '@/lib/types';
 
 export function AdminDashboardContent() {
   const { adminId } = useAdminAuth();
-  const [salas, setSalas] = useState<Sala[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSalas = async () => {
+    const fetchRooms = async () => {
       try {
-        const salasData = await loadSalas();
-        setSalas(salasData);
+        const roomsData = await loadRooms();
+        setRooms(roomsData);
       } catch {
         // Silently fail
       } finally {
@@ -23,11 +23,11 @@ export function AdminDashboardContent() {
       }
     };
 
-    fetchSalas();
+    fetchRooms();
   }, []);
 
-  const salasAtivas = salas.filter((sala) => sala.ativa);
-  const salasFinalizadas = salas.filter((sala) => !sala.ativa);
+  const activeRooms = rooms.filter((room) => room.gameState !== 'completed');
+  const finishedRooms = rooms.filter((room) => room.gameState === 'completed');
 
   return (
     <div className="space-y-6">
@@ -57,7 +57,7 @@ export function AdminDashboardContent() {
               Salas Ativas
             </h3>
             <p className="text-green-700 text-2xl font-bold">
-              {loading ? '...' : salasAtivas.length}
+              {loading ? '...' : activeRooms.length}
             </p>
           </div>
         </div>
@@ -70,25 +70,25 @@ export function AdminDashboardContent() {
         </h3>
         {loading ? (
           <p className="text-gray-600">Carregando...</p>
-        ) : salasAtivas.length === 0 ? (
+        ) : activeRooms.length === 0 ? (
           <p className="text-gray-600">
             Nenhuma sala ativa. Crie uma nova sala para começar.
           </p>
         ) : (
           <div className="space-y-3">
-            {salasAtivas.map((sala) => (
+            {activeRooms.map((room) => (
               <Link
-                key={sala.id}
-                href={`/admin/room/${sala.id}`}
+                key={room.id}
+                href={`/admin/room/${room.id}`}
                 className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
               >
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-semibold text-gray-900">
-                      Sala {sala.id}
+                      Sala {room.id}
                     </p>
                     <p className="text-sm text-gray-600">
-                      {sala.numerosSorteados?.length || 0} número(s) sorteado(s)
+                      {room.drawnNumbers?.length || 0} número(s) sorteado(s)
                     </p>
                   </div>
                   <div>
@@ -104,25 +104,25 @@ export function AdminDashboardContent() {
       </div>
 
       {/* Completed Rooms */}
-      {salasFinalizadas.length > 0 && (
+      {finishedRooms.length > 0 && (
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Histórico de Salas Finalizadas
           </h3>
           <div className="space-y-3">
-            {salasFinalizadas.slice(0, 5).map((sala) => (
+            {finishedRooms.slice(0, 5).map((room) => (
               <Link
-                key={sala.id}
-                href={`/admin/room/${sala.id}`}
+                key={room.id}
+                href={`/admin/room/${room.id}`}
                 className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
               >
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-semibold text-gray-900">
-                      Sala {sala.id}
+                      Sala {room.id}
                     </p>
                     <p className="text-sm text-gray-600">
-                      {sala.numerosSorteados?.length || 0} número(s) sorteado(s)
+                      {room.drawnNumbers?.length || 0} número(s) sorteado(s)
                     </p>
                   </div>
                   <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">

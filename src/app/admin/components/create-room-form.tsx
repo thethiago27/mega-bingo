@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createRoom } from "@/lib/database";
-import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useAdminAuth } from '@/hooks/use-admin-auth';
+import { createRoom } from '@/lib/database';
 
 export function CreateRoomForm() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export function CreateRoomForm() {
 
   const handleCreateRoom = async () => {
     if (!adminId) {
-      setError("Admin ID não encontrado. Por favor, faça login novamente.");
+      setError('Admin ID não encontrado. Por favor, faça login novamente.');
       return;
     }
 
@@ -21,11 +21,10 @@ export function CreateRoomForm() {
     setError(null);
 
     try {
-      // Usa o sistema antigo de salas que já funciona com jogadores
-      const roomId = await createRoom("Sala do Admin");
+      const roomId = await createRoom(adminId);
       router.push(`/admin/room/${roomId}`);
-    } catch (err) {
-      setError("Erro ao criar sala. Por favor, tente novamente.");
+    } catch (_err) {
+      setError('Erro ao criar sala. Por favor, tente novamente.');
       setCreating(false);
     }
   };
@@ -49,13 +48,15 @@ export function CreateRoomForm() {
 
       <div className="flex gap-4">
         <button
+          type="button"
           onClick={handleCreateRoom}
           disabled={creating}
           className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition"
         >
-          {creating ? "Criando sala..." : "Criar Sala"}
+          {creating ? 'Criando sala...' : 'Criar Sala'}
         </button>
         <button
+          type="button"
           onClick={() => router.back()}
           disabled={creating}
           className="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed transition"

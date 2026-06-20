@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect } from 'react';
+import { useAdminAuth } from '@/hooks/use-admin-auth';
 
 export function AdminLoginContent() {
   const router = useRouter();
@@ -13,19 +13,19 @@ export function AdminLoginContent() {
   }, [loginAnonymously]);
 
   const handleGoHome = useCallback(() => {
-    router.push("/");
+    router.push('/');
   }, [router]);
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/admin");
+      router.push('/admin');
       return;
     }
 
     const doLogin = async () => {
       try {
         await loginAnonymously();
-        router.push("/admin");
+        router.push('/admin');
       } catch {
         // Error is handled by the hook
       }
@@ -53,6 +53,7 @@ export function AdminLoginContent() {
               {error}
             </div>
             <button
+              type="button"
               onClick={handleRetry}
               className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
             >
@@ -60,6 +61,7 @@ export function AdminLoginContent() {
             </button>
             <div>
               <button
+                type="button"
                 onClick={handleGoHome}
                 className="text-sm text-gray-600 hover:text-gray-800"
               >
